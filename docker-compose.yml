@@ -23,7 +23,7 @@ services:
   php:
     image: php:fpm
     volumes:
-      - ./app:/app
+      - /location/app:/code/app
     expose:
       - '9000'
     environment:
