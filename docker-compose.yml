@@ -1,0 +1,55 @@
+version: '3.8'
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - '80:80'
+    volumes:
+      - ./nginx/site.conf:/etc/nginx/conf.d/site.conf
+      - /location/app:/code/app
+    depends_on:
+      - php
+    networks:
+      - frontend
+      - backend
+
+  php:
+    image: php:fpm
+    volumes:
+      - ./app:/app
+    expose:
+      - '9000'
+    environment:
+      - PHP_IDE_CONFIG=serverName=php-dev
+    networks:
+      - backend
+
+  postgres:
+    image: postgres:latest
+    volumes:
+      - /location/postgres:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_DB=database
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+    networks:
+      - backend
+
+  redis:
+    image: redis:latest
+    volumes:
+      - /location/redis:/data
+    command: --requirepass password
+    ports:
+      - '6379:6379'
+    networks:
+      - backend
